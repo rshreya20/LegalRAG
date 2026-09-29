@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Legal AI Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app-shell">
+
+    <!-- ========================================================= -->
+    <!-- Sidebar -->
+    <!-- ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ⚖
+            </div>
+
+            <div>
+                <h1>Legal AI</h1>
+                <span>Contract Assistant</span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-label">
+                DOCUMENT
+            </p>
+
+            <div
+                id="sidebarFile"
+                class="sidebar-file"
+            >
+                No document uploaded
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <p class="sidebar-label">
+                AI MODEL
+            </p>
+
+            <div class="model-badge">
+                <span class="status-dot"></span>
+                <span id="modelName">
+                    Groq GPT-OSS-20B
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="disclaimer-small">
+
+                <strong>⚠ Legal Notice</strong>
+
+                <p>
+                    This tool is for educational purposes only
+                    and does not constitute legal advice.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ========================================================= -->
+    <!-- Main -->
+    <!-- ========================================================= -->
+
+    <main class="main-content">
+
+
+        <!-- Header -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h2>
+                    Legal AI Assistant
+                </h2>
+
+                <p>
+                    Analyze contracts using RAG and AI
+                </p>
+
+            </div>
+
+            <div
+                id="serverStatus"
+                class="server-status"
+            >
+                <span class="status-dot"></span>
+                Ready
+            </div>
+
+        </header>
+
+
+        <!-- ===================================================== -->
+        <!-- Upload Section -->
+        <!-- ===================================================== -->
+
+        <section
+            id="uploadSection"
+            class="upload-section"
+        >
+
+            <div class="upload-card">
+
+                <div class="upload-icon">
+                    📄
+                </div>
+
+                <h2>
+                    Upload a Contract
+                </h2>
+
+                <p>
+                    Upload a PDF or DOCX contract to begin analysis.
+                </p>
+
+
+                <label
+                    for="fileInput"
+                    id="dropZone"
+                    class="drop-zone"
+                >
+
+                    <div class="drop-icon">
+                        ⬆
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Drop your contract here
+                        </strong>
+
+                        <span>
+                            or click to browse
+                        </span>
+
+                    </div>
+
+                    <small>
+                        Supported formats: PDF, DOCX • Max 25 MB
+                    </small>
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept=".pdf,.docx"
+                        hidden
+                    >
+
+                </label>
+
+
+                <div
+                    id="selectedFile"
+                    class="selected-file hidden"
+                >
+
+                    <span class="file-icon">
+                        📄
+                    </span>
+
+                    <div class="selected-file-info">
+
+                        <strong id="selectedFileName">
+                            contract.pdf
+                        </strong>
+
+                        <span id="selectedFileSize">
+                            0 KB
+                        </span>
+
+                    </div>
+
+                    <button
+                        id="removeFile"
+                        class="icon-button"
+                        type="button"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <button
+                    id="analyzeBtn"
+                    class="primary-button"
+                    type="button"
+                    disabled
+                >
+
+                    <span id="analyzeBtnText">
+                        Analyze Contract
+                    </span>
+
+                    <span
+                        id="analyzeSpinner"
+                        class="spinner hidden"
+                    ></span>
+
+                </button>
+
+
+                <div
+                    id="uploadError"
+                    class="error-message hidden"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===================================================== -->
+        <!-- Loading -->
+        <!-- ===================================================== -->
+
+        <section
+            id="loadingSection"
+            class="loading-section hidden"
+        >
+
+            <div class="loading-card">
+
+                <div class="loader"></div>
+
+                <h2>
+                    Analyzing your contract
+                </h2>
+
+                <p>
+                    This may take a little while.
+                    The AI is reading, indexing and analyzing your document.
+                </p>
+
+                <div class="loading-steps">
+
+                    <div
+                        id="stepParse"
+                        class="loading-step"
+                    >
+                        <span>✓</span>
+                        Parsing document
+                    </div>
+
+                    <div
+                        id="stepIndex"
+                        class="loading-step"
+                    >
+                        <span>2</span>
+                        Building vector index
+                    </div>
+
+                    <div
+                        id="stepAI"
+                        class="loading-step"
+                    >
+                        <span>3</span>
+                        Running AI analysis
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===================================================== -->
+        <!-- Dashboard -->
+        <!-- ===================================================== -->
+
+        <section
+            id="dashboard"
+            class="dashboard hidden"
+        >
+
+            <!-- Document Header -->
+
+            <div class="document-header">
+
+                <div>
+
+                    <div class="document-title-row">
+
+                        <span class="document-icon">
+                            📄
+                        </span>
+
+                        <div>
+
+                            <h2 id="documentName">
+                                Contract
+                            </h2>
+
+                            <p id="documentMeta">
+                                Document analyzed successfully
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="newAnalysisBtn"
+                    class="secondary-button"
+                    type="button"
+                >
+                    + New Contract
+                </button>
+
+            </div>
+
+
+            <!-- Stats -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        📄
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Pages
+                        </span>
+
+                        <strong id="pageCount">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        §
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Clauses
+                        </span>
+
+                        <strong id="clauseCount">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon orange">
+                        ⚠
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Risks
+                        </span>
+
+                        <strong id="riskCount">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        !
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Conflicts
+                        </span>
+
+                        <strong id="conflictCount">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Tabs -->
+
+            <div class="tabs">
+
+                <button
+                    class="tab active"
+                    data-tab="summary"
+                >
+                    📋 Summary
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="clauses"
+                >
+                    📑 Clauses
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="risks"
+                >
+                    ⚠️ Risks
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="conflicts"
+                >
+                    🔍 Conflicts
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="qa"
+                >
+                    💬 Ask AI
+                </button>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Summary -->
+            <!-- ================================================= -->
+
+            <div
+                id="tab-summary"
+                class="tab-content active"
+            >
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Executive Summary
+                            </h3>
+
+                            <p>
+                                Key information extracted from the contract.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="summary-grid">
+
+                        <div class="summary-item">
+
+                            <span class="summary-label">
+                                Contract Type
+                            </span>
+
+                            <strong id="contractType">
+                                -
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-item">
+
+                            <span class="summary-label">
+                                Effective Date
+                            </span>
+
+                            <strong id="effectiveDate">
+                                -
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-item">
+
+                            <span class="summary-label">
+                                Duration
+                            </span>
+
+                            <strong id="duration">
+                                -
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="parties-section">
+
+                        <h4>
+                            Parties
+                        </h4>
+
+                        <div
+                            id="partiesList"
+                            class="parties-list"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="obligations-section">
+
+                        <h4>
+                            Key Obligations
+                        </h4>
+
+                        <ul
+                            id="obligationsList"
+                            class="obligations-list"
+                        ></ul>
+
+                    </div>
+
+
+                    <div class="summary-text-section">
+
+                        <h4>
+                            Summary
+                        </h4>
+
+                        <p id="summaryText">
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Clauses -->
+            <!-- ================================================= -->
+
+            <div
+                id="tab-clauses"
+                class="tab-content"
+            >
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Extracted Clauses
+                            </h3>
+
+                            <p>
+                                Important provisions identified in the contract.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="clausesContainer"
+                        class="clauses-container"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Risks -->
+            <!-- ================================================= -->
+
+            <div
+                id="tab-risks"
+                class="tab-content"
+            >
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Risk Analysis
+                            </h3>
+
+                            <p>
+                                Potential risks identified by the AI.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="risksContainer"
+                        class="risks-container"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Conflicts -->
+            <!-- ================================================= -->
+
+            <div
+                id="tab-conflicts"
+                class="tab-content"
+            >
+
+                <div class="content-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Conflict Detection
+                            </h3>
+
+                            <p>
+                                Potential contradictions within the contract.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="conflictsContainer"
+                        class="conflicts-container"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- Q&A -->
+            <!-- ================================================= -->
+
+            <div
+                id="tab-qa"
+                class="tab-content"
+            >
+
+                <div class="content-card qa-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Ask AI About Your Contract
+                            </h3>
+
+                            <p>
+                                Ask questions grounded in the uploaded document.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="chatMessages"
+                        class="chat-messages"
+                    >
+
+                        <div class="chat-welcome">
+
+                            <div class="chat-ai-icon">
+                                ✨
+                            </div>
+
+                            <h3>
+                                Contract Q&A
+                            </h3>
+
+                            <p>
+                                Ask me about the provisions contained in
+                                your uploaded contract.
+                            </p>
+
+                            <div class="suggested-questions">
+
+                                <button
+                                    class="suggestion"
+                                    data-question="What are the termination rights?"
+                                >
+                                    What are the termination rights?
+                                </button>
+
+                                <button
+                                    class="suggestion"
+                                    data-question="What is the liability cap?"
+                                >
+                                    What is the liability cap?
+                                </button>
+
+                                <button
+                                    class="suggestion"
+                                    data-question="What are the confidentiality obligations?"
+                                >
+                                    What are the confidentiality obligations?
+                                </button>
+
+                                <button
+                                    class="suggestion"
+                                    data-question="Who owns the IP?"
+                                >
+                                    Who owns the IP?
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chat-input-area">
+
+                        <textarea
+                            id="questionInput"
+                            rows="2"
+                            placeholder="Ask a question about the contract..."
+                        ></textarea>
+
+                        <button
+                            id="askBtn"
+                            class="ask-button"
+                            type="button"
+                        >
+                            <span id="askBtnText">
+                                Ask AI
+                            </span>
+
+                            <span
+                                id="askSpinner"
+                                class="spinner hidden"
+                            ></span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
+
+</body>
+
+</html>
