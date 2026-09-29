@@ -1,179 +1,194 @@
-# GenAI Beginner Projects
+# ⚖️ LegalRAG
 
-A hands-on learning path for developers new to Generative AI. Five self-contained projects that take you from basic RAG to agentic systems with real-time data — each building on the previous.
+### AI-Powered Legal Contract Analysis using Retrieval-Augmented Generation
 
----
+LegalRAG is an AI-powered contract analysis application that uses **Retrieval-Augmented Generation (RAG)** to analyze legal documents and provide users with relevant, context-aware answers.
 
-## Why These 5 Projects?
-
-Most GenAI tutorials show you a hello-world demo and call it a day. These projects are different:
-
-- **Real code**, not toy examples — each project solves an actual use case
-- **Step-by-step comments** explain *why*, not just *what*
-- **Progressive complexity** — each project introduces exactly one new concept
-- **Works with OpenAI or Ollama** — you're not gated by API costs
+The system allows users to upload **PDF or DOCX contracts** and automatically analyzes the document to generate summaries, extract important clauses, identify potential risks, detect possible conflicts, and answer questions about the contract.
 
 ---
 
-## Prerequisites
+## 📌 What is LegalRAG?
 
-| Requirement | Notes |
-|-------------|-------|
-| Python 3.10+ | `python --version` to check. Project 4 uses `X \| None` type syntax, which is a hard requirement, not just a suggestion. |
-| OpenAI API key | Required for all 5 projects. Get one at [platform.openai.com/api-keys](https://platform.openai.com/api-keys). Project 1 can run key-free via Ollama instead. |
-| Git | For cloning the repo |
-| 8 GB RAM minimum | For running local embedding models (`sentence-transformers` downloads ~80 MB on first run) |
+LegalRAG combines **Large Language Models (LLMs)** with **Retrieval-Augmented Generation** to make legal documents easier to understand and query.
 
-> 💰 **Cost note:** Every project uses free, local embeddings (`sentence-transformers` + FAISS) — you only pay OpenAI for the LLM calls. A full run through any single project typically costs a few cents on `gpt-4o-mini`/`gpt-3.5-turbo`. Projects 4 and 5 have their own cost breakdowns in their READMEs since they make more (or pricier) calls.
+Instead of sending the complete contract to the AI every time a user asks a question, LegalRAG:
 
-> 📂 **No sample documents ship with this repo.** Every project's `data/` folder is intentionally empty (just a `.gitkeep`) so you bring your own PDFs/contracts/papers. Each project's README tells you exactly where to drop files and, in Project 1, how to build a quick synthetic test file to sanity-check retrieval before using real documents.
+1. Parses the uploaded document.
+2. Splits the document into smaller chunks.
+3. Generates embeddings for the chunks.
+4. Creates a searchable vector index.
+5. Retrieves the most relevant sections when a question is asked.
+6. Sends the relevant context to the LLM.
+7. Generates a response based on the retrieved contract content.
 
----
-
-## Project Map
-
-| # | Project | Difficulty | Key New Concept | One-Line Description |
-|---|---------|-----------|----------------|----------------------|
-| 1 | [RAG From Scratch](./01-rag-from-scratch/) | ⭐⭐ Beginner | Embeddings, vector search | Build a Q&A system over your own documents |
-| 2 | [Legal AI Assistant](./02-legal-ai-assistant/) | ⭐⭐⭐ Beginner+ | Domain prompting, structured output | Analyze contracts for risks, clauses, and conflicts |
-| 3 | [AI Research Agent](./03-research-agent/) | ⭐⭐⭐ Intermediate | Agents, multi-step reasoning | Synthesize multiple research papers and find gaps |
-| 4 | [Multimodal RAG](./04-multimodal-rag/) | ⭐⭐⭐⭐ Intermediate | Vision models, multi-index | RAG that understands text, images, and tables |
-| 5 | [Agentic RAG + Real-Time](./05-agentic-rag-realtime/) | ⭐⭐⭐⭐ Intermediate | Tool use, live data APIs | Agent that combines stored docs with live web/financial data |
+This approach helps the system focus on the actual information contained in the uploaded document.
 
 ---
 
-## Learning Path
+# 🎯 Problem Statement
 
-Follow the projects in order — each one adds exactly one new layer:
+Legal contracts can be lengthy, complex, and difficult to analyze manually.
 
+Users may need to spend significant time searching for information such as:
+
+- Termination conditions
+- Liability limitations
+- Confidentiality requirements
+- Governing law
+- Important obligations
+- Potential risks
+- Conflicting clauses
+- Specific contractual rights
+
+Traditional document search mainly depends on keywords, which may not always understand the meaning behind a question.
+
+For example, a user may ask:
+
+> "What happens if I want to end this agreement?"
+
+Even if the contract does not contain the exact phrase "end this agreement", the relevant section may use the word **termination**.
+
+LegalRAG uses semantic retrieval to locate relevant contract content and provide an answer using the retrieved context.
+
+---
+
+
+## 🚀 Key Features
+
+### 📄 Contract Upload
+- Upload PDF and DOCX contracts
+- Automatic document processing
+- File validation through the web interface
+- Supports contracts up to the configured file-size limit
+
+### 📋 Executive Summary
+Generates a concise overview of the uploaded contract, including important parties, obligations, and key provisions.
+
+### 🔍 Clause Extraction
+Identifies important contractual clauses such as:
+
+- Termination
+- Limitation of Liability
+- Confidentiality
+- Governing Law
+- Intellectual Property
+
+### ⚠️ Risk Analysis
+Analyzes the contract to identify potential risks and provisions that may require further attention.
+
+### 🔄 Conflict Detection
+Detects potential inconsistencies or conflicting provisions within the contract.
+
+### 🧩 Document Chunking
+Large documents are divided into smaller chunks before being indexed.
+
+Chunking allows the system to retrieve only the most relevant sections when answering a question instead of sending the entire document to the LLM.
+
+Example:
+
+```text
+Large Contract
+      ↓
+Document Parsing
+      ↓
+Text Chunking
+      ↓
+ ┌──────────┐
+ │ Chunk 1  │
+ │ Chunk 2  │
+ │ Chunk 3  │
+ │ Chunk 4  │
+ │    ...   │
+ └──────────┘
+      ↓
+Vector Index
+      ↓
+Relevant Chunks Retrieved 
 ```
-Project 1: RAG From Scratch
-    ↓  (adds domain-specific prompting)
-Project 2: Legal AI Assistant
-    ↓  (adds agent framework + tools)
-Project 3: AI Research Agent
-    ↓  (adds vision models + multi-index)
-Project 4: Multimodal RAG
-    ↓  (adds live data tools + planning)
-Project 5: Agentic RAG + Real-Time
-```
+---
 
-**Skill progression:**
-- After Project 1: You understand how RAG works and can build basic Q&A over documents
-- After Project 2: You can write domain-specific prompts and structure LLM output as JSON
-- After Project 3: You understand agents and can build multi-step reasoning systems
-- After Project 4: You can handle documents with images and tables, not just text
-- After Project 5: You can build production-grade agents that combine stored knowledge with live data
+## 🛠️ TECH STACK
+- ### Backend
+    Python
+    Flask
+    LangChain
+    RAG (Retrieval-Augmented Generation)
+- ### AI / LLM
+    Groq API
+    openai/gpt-oss-20b
+    LLM-based contract analysis
+- ### Document Processing
+    Python document parsing
+    PDF processing
+    DOCX processing
+    Text chunking
+- ### Vector Search
+    Hugging Face embeddings
+    Vector database / local vector index
+    Semantic similarity search
+- ### Frontend
+    HTML5
+    CSS3
+    JavaScript
+- ### Responsive web interface
+    Development Tools
+    VS Code
+    Python Virtual Environment
+    Git/GitHub
+    
+---
+
+## ⚙️ Running LegalRAG Locally
+### 1. Clone the Repository
+    git clone <your-github-repository-url>
+    cd LegalRAG
+### 2. Create a Virtual Environment
+    python -m venv venv
+### 3. Activate the Virtual Environment
+
+Windows PowerShell:
+
+    venv\Scripts\Activate.ps1
+### 4. Install Dependencies
+    pip install -r requirements.txt
+### 5. Configure Environment Variables
+
+Create a .env file in the project root:
+
+    GROQ_API_KEY=your_groq_api_key
+    GROQ_MODEL=openai/gpt-oss-20b
+
+#### Do not upload your .env file to GitHub.
+
+### 6. Start the Application
+    python app.py
+
+Then open the local URL shown in the terminal, usually:
+
+    http://127.0.0.1:5000
+
+### 7. Use the Application
+- Open the LegalRAG dashboard. 
+- Upload a PDF or DOCX contract.
+- Click Analyze Contract.
+- Wait for the document to be processed.
+- Review the summary, extracted clauses, risk analysis, and conflict detection.
+- Ask questions about the uploaded contract using the RAG-based Q&A interface.
+---
+
+## ⚠️ Legal Disclaimer
+
+#### LegalRAG  is an educational and technical demonstration of Retrieval-Augmented Generation for document analysis.
+
+#### It does not provide legal advice and should not be used as a substitute for consultation with a qualified legal professional.
+
+#### Always verify important findings and interpretations with a qualified attorney.
 
 ---
 
-## Quick Setup
+## 👩‍💻 Author
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/techwithprateek/agenticai-projects.git
-cd agenticai-projects
+#### Shreya Rai
 
-# 2. Pick a project to start with
-cd 01-rag-from-scratch
-
-# 3. Create a virtual environment (recommended — keeps dependencies isolated)
-python -m venv venv
-source venv/bin/activate       # Mac/Linux
-# venv\Scripts\activate        # Windows
-
-# 4. Install dependencies
-pip install -r requirements.txt
-
-# 5. Set up environment variables
-cp .env.example .env
-# Edit .env and add your API keys
-
-# 6. Confirm it's wired up correctly (no API key needed for --help)
-python main.py --help
-
-# 7. Add at least one document, then run for real — see "Add your documents"
-#    in that project's own README for exactly where files go and what
-#    formats are supported.
-python main.py
-```
-
-> **Tip:** Each project has its own `venv` and `requirements.txt`. You don't need to install everything at once — set one project up, confirm it works end to end, then move to the next.
-
-> **Verifying your install worked:** `python main.py --help` should print the full argument list with no errors or warnings about missing packages. If it does, your virtual environment and dependencies are correct — any errors after that point are about API keys or missing documents, not a broken install.
-
----
-
-## Glossary
-
-Plain-English definitions for terms you'll encounter in these projects:
-
-| Term | Plain-English Definition |
-|------|--------------------------|
-| **RAG** | Retrieval-Augmented Generation — feeding relevant documents to an LLM before asking it a question, so it answers based on your data instead of guessing |
-| **Embedding** | A list of numbers (a vector) that represents the meaning of a piece of text. Similar texts have similar vectors. |
-| **Vector store** | A database optimized for finding similar vectors quickly. FAISS is a popular local option. |
-| **FAISS** | Facebook AI Similarity Search — a library that stores vectors and finds the most similar ones very fast |
-| **Agent** | An LLM that can take actions (like calling tools) to complete a goal, rather than just answering a single question |
-| **Tool** | A function the agent can call — like searching the web, getting stock prices, or searching your documents |
-| **Chain** | A sequence of LLM calls or operations linked together. LangChain helps you build these. |
-| **Prompt template** | A reusable text structure with variables that gets filled in at runtime. Like a form letter for LLMs. |
-| **Hallucination** | When an LLM confidently states something false. RAG reduces this by grounding answers in real documents. |
-| **Chunk** | A small piece of a larger document (usually 300–1000 characters). Documents are split into chunks for embedding. |
-| **Top-k retrieval** | Finding the k most similar chunks to a question. k=3 means: "find the 3 most relevant passages." |
-| **ReAct** | Reason + Act — an agent pattern where the LLM thinks about what to do, does it, observes the result, and repeats |
-| **LangChain** | A Python framework for building LLM applications. Provides building blocks for RAG, agents, chains, and more. |
-
----
-
-## Using Ollama (Free Local LLMs)
-
-Don't want to pay for OpenAI? Use Ollama to run LLMs on your own machine:
-
-```bash
-# Install Ollama: https://ollama.com
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull a model
-ollama pull llama3
-
-# In any project, use:
-python main.py --model ollama/llama3
-```
-
-> **Note:** Local models require ~8 GB RAM for small models. They're slower than OpenAI but completely free.
-
----
-
-## Repository Structure
-
-```
-genai-beginner-projects/
-│
-├── README.md                        ← You are here
-│
-├── 01-rag-from-scratch/             ← ⭐⭐ Build RAG from scratch
-├── 02-legal-ai-assistant/           ← ⭐⭐⭐ Legal document analysis
-├── 03-research-agent/               ← ⭐⭐⭐ AI research synthesis agent
-├── 04-multimodal-rag/               ← ⭐⭐⭐⭐ Text + images + tables
-└── 05-agentic-rag-realtime/         ← ⭐⭐⭐⭐ Live data + documents
-```
-
-Each project folder contains:
-- `README.md` — what the project does, how to run it, what you'll learn
-- `requirements.txt` — all Python dependencies pinned to specific versions
-- `.env.example` — copy this to `.env` and fill in your API keys
-- `main.py` — the entry point to run the project
-- `src/` — well-commented source files organized by feature
-
----
-
-## Contributing
-
-Found a bug? Have an improvement? Open an issue or PR.
-
-When adding comments or documentation, remember the audience: developers with 3–4 years of experience who are new to GenAI. Explain the "why", not just the "what".
-
----
-
-*All projects support both OpenAI API and local Ollama models. You don't need to pay for API access to learn from these projects.*
+#### B.Tech Computer Science Engineering | AI/ML & Cybersecurity
